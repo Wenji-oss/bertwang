@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZW Portfolio</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    color: #000;
+  }
+
+  .container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .main-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    width: 10vw;
+    max-width: 160px;
+    cursor: pointer;
+  }
+
+  .logo img {
+    width: 400%;
+    height: auto;
+    display: block;
+    transition: filter 0.15s linear;
+  }
+
+  .logo:hover img {
+    filter: brightness(0) saturate(100%) invert(15%) sepia(93%) saturate(7500%) hue-rotate(-5deg) brightness(95%) contrast(110%);
+  }
+
+  .works {
+    position: absolute;
+    top: 53%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    text-align: left;
+    font-size: 35px;
+    line-height: 2.3;
+    cursor: default;
+  }
+
+  .category {
+    font-weight: 700;
+    margin-top: 1rem;
+  }
+
+  .work-item {
+    display: flex;
+    justify-content: space-between;
+    width: 700px;
+    cursor: pointer;
+    transition: color 0.15s linear;
+  }
+
+  .title,
+  .year {
+    font-weight: normal;
+    color: #000;
+    transition: color 0.15s linear;
+  }
+
+  .work-item:hover .title,
+  .work-item:hover .year {
+    color: rgb(197, 27, 27);
+  }
+
+  .work-item:hover .title {
+    text-decoration: underline;
+  }
+
+  /* 竖向年份连线——位置由 JS 动态计算 */
+  .year-line {
+    position: absolute;
+    width: 3px;           /* 细线厚度 */
+    background-color: #000;
+    pointer-events: none;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    color: #000;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .overlay-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .overlay-center {
+    position: absolute;
+    top: 59%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .overlay-video-wrapper {
+    position: relative;
+    width: 50vw;
+    max-width: 960px;
+    min-width: 320px;
+    aspect-ratio: 16/9;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay-video-wrapper video {
+    width: 150%;
+    height: 150%;
+    display: block;
+    background-color: #000;
+  }
+
+  /* ▶ 新增：视频下方的 YouTube 链接条 */
+  .overlay-link-bar {
+    margin-top: 18%;
+    width: 33vw;
+    max-width: 2000px;
+    min-width: 320px;
+    text-align: left;
+    font-size: 30px;
+  }
+
+  .overlay-link-bar a {
+    color: #0066ff;
+    text-decoration: underline;
+    word-break: break-all;
+  }
+
+  .overlay-description {
+    margin-top: 4%;
+    width: 50vw;
+    max-width: 1000px;
+    min-width: 320px;
+    font-size: 12px;
+    line-height: 2;
+    margin-left: 5%;
+  }
+
+  .desc-title {
+    font-size: 60px;
+    font-weight: 600;
+    color: rgb(197, 27, 27);
+    margin-bottom: 0.5rem;
+  }
+
+  .desc-meta {
+    font-size: 30px;
+    font-weight: 500;
+    color: rgb(197, 27, 27);
+    margin-bottom: 1rem;
+  }
+
+  .desc-text {
+    font-size: 30px;
+    font-weight: normal;
+    color: #000;
+  }
+
+  .overlay-sidepanel {
+    position: absolute;
+    right: 10%;
+    top: 15%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 30px;
+    line-height: 1.6;
+  }
+
+  .overlay-close {
+    font-size: 40px;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    user-select: none;
+    transition: color 0.15s linear;
+  }
+
+  .overlay-close:hover {
+    color: rgb(197, 27, 27);
+    text-decoration: underline;
+  }
+
+  /* ===== Bio overlay 样式 ===== */
+  .bio-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  .bio-card {
+    pointer-events: auto;
+    background-color: #ffffff;
+    width: 80vw;
+    max-width: 1100px;
+    aspect-ratio: 11 / 8.5;
+    max-height: 80vh;
+    border: 1px solid #eee;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    position: absolute;
+    Left:10%;
+    padding: 4% 6% 4% 0;
+    box-sizing: border-box;
+    /* 整体放大一点 */
+    transform: scale(1.3);
+    transform-origin: center;
+  }
+
+  /* 主文本与 red dot 左边缘对齐：都用 10% 偏移 */
+  .bio-text {
+    color: rgb(197, 27, 27);
+    font-size: 20px;
+    line-height: 1.8;
+    max-width: 80%;
+    margin-left: 10%;
+  }
+
+  .bio-text p {
+    margin: 0 0 0.6rem 0;
+  }
+
+  /* 右侧整块红色面板，从 Bio 标题顶到底边 */
+  .bio-header-strip {
+    position: absolute;
+    top: 20%;
+    right: 0;
+    bottom: 0;
+    width: 17%;
+    background-color: rgb(187, 36, 27);
+    box-sizing: border-box;
+    padding: 1.2rem 2rem;
+  }
+
+  .bio-title-block {
+    color: #fff;
+    font-weight: 700;
+    font-size: 28px;
+  }
+
+  .bio-close {
+    position: absolute;
+    top: 0.8rem;
+    right: 1.5rem;
+    font-size: 35px;
+    font-weight: 400;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .bio-footer {
+    position: absolute;
+    left: 10%;
+    bottom: 8%;
+    display: flex;
+    align-items: center;
+    color: rgb(187, 36, 27);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .bio-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: rgb(187, 36, 27);
+    margin-right: 1rem;
+  }
+
+  .bio-contact {
+    line-height: 1.4;
+  }
+
+  @media (max-width: 900px) {
+    .works {
+      font-size: 24px;
+      width: 500px;
+    }
+
+    .work-item {
+      width: 500px;
+    }
+
+    .overlay-video-wrapper,
+    .overlay-description,
+    .overlay-link-bar {
+      width: 70vw;
+    }
+
+    .bio-card {
+      width: 90vw;
+      padding: 5% 7% 5% 0;
+      transform: scale(1.1);
+    }
+
+    .bio-text {
+      font-size: 16px;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .works {
+      font-size: 18px;
+      width: 320px;
+    }
+
+    .work-item {
+      width: 320px;
+    }
+
+    .overlay-video-wrapper,
+    .overlay-description,
+    .overlay-link-bar {
+      width: 80vw;
+      min-width: 260px;
+    }
+
+    .bio-card {
+      width: 94vw;
+      padding: 6% 6% 6% 0;
+      transform: scale(1.0);
+    }
+
+    .bio-text {
+      font-size: 14px;
+    }
+
+    .bio-title-block {
+      font-size: 22px;
+    }
+
+    .bio-close {
+      font-size: 32px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 主视图：logo + 作品列表 -->
+    <div class="main-view" id="mainView">
+      <div class="logo" id="logo">
+        <img src="zwlogo.svg" alt="ZW Logo" />
+      </div>
+
+      <!-- 分类 + 排序后的列表 -->
+      <div class="works" id="workList">
+
+        <!-- Documentary -->
+        <div class="category">Documentary</div>
+        <div class="work-item"
+             data-video="The indecisive moment.mp4"
+             data-drive="https://drive.google.com/file/d/1v-uLkfgAOqIWUtd8eOkXeJ9dKiK3qYs_/preview">
+          <span class="title">The Indecisive Moment</span>
+          <span class="year">2025</span>
+        </div>
+
+        <!-- Video Art -->
+        <div class="category">Video Art</div>
+        <div class="work-item"
+             data-video="Calligram of Triregnum Final 4k.mp4"
+             data-drive="https://drive.google.com/file/d/1d0YGhGY5c2WfSbPd963RPTM0sOxWHgHt/preview">
+          <span class="title">Calligram of Triregnum</span>
+          <span class="year"></span>
+        </div>
+
+        <!-- 交换顺序：先 Ozymandias 再 Harakiri Duel -->
+        <div class="work-item"
+             data-video="Ozymandias (2024FA).mp4"
+             data-drive="https://drive.google.com/file/d/1BcnQz3zcuYdo9ASRQfPikhXHqIVEAAVZ/preview">
+          <span class="title">Ozymandias</span>
+          <span class="year"></span>
+        </div>
+
+        <div class="work-item"
+             data-video="Harakiri+Duel.mp4"
+             data-drive="https://www.youtube.com/embed/1H5q_HdxQ8A?si=o2xR50QdklSakTJo">
+          <span class="title">Harakiri Duel</span>
+          <span class="year"></span>
+        </div>
+
+        <!-- Shorts -->
+        <div class="category">Shorts</div>
+        <div class="work-item"
+             data-video="Whistleblower-Final cut.mp4"
+             data-drive="https://drive.google.com/file/d/1ESI0uZn0Q_3w2NLFwwiSaGejK55qmTK-/preview">
+          <span class="title">Whistleblower</span>
+          <span class="year"></span>
+        </div>
+
+        <div class="work-item"
+             data-video="Stormy.mp4"
+             data-drive="https://drive.google.com/file/d/1dqMM8LHtbeCo5q_JKDrRpgyhF4dATFHi/preview">
+          <span class="title">Stormy</span>
+          <span class="year">2022</span>
+        </div>
+
+        <!-- 竖向细线（位置由 JS 设置） -->
+        <div class="year-line"></div>
+
+      </div>
+    </div>
+
+    <!-- Video Overlay -->
+    <div class="overlay" id="overlay">
+      <div class="overlay-content">
+        <div class="overlay-center">
+          <div class="overlay-video-wrapper">
+            <video id="overlayVideo" controls></video>
+          </div>
+
+          <!-- ▶ 新增：视频下方的 YouTube 链接条 -->
+          <div class="overlay-link-bar" id="overlayLinkBar">
+            <a id="overlayLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+
+          <!-- 描述文字区域 -->
+          <div class="overlay-description" id="overlayDescription"></div>
+        </div>
+
+        <!-- 右侧只保留关闭按钮 -->
+        <div class="overlay-sidepanel">
+          <div class="overlay-close" id="overlayClose">X</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bio 叠加卡片 -->
+    <div class="bio-overlay" id="bioOverlay">
+      <div class="bio-card">
+        <div class="bio-text">
+          <p>Focuses on experimental film and art-making.</p>
+          <p>Has a background in film, costume design, and philosophy.</p>
+          <p>Currently graduating from California College of the Arts with a degree in Film.</p>
+          <p>Possesses extensive knowledge of politics, philosophy, art, and film history.</p>
+          <p>Dedicated to becoming a filmmaker whose works can meaningfully influence people’s thinking and speak to living, breathing individuals around the world.</p>
+        </div>
+
+        <div class="bio-header-strip">
+          <div class="bio-title-block">Bio</div>
+          <div class="bio-close" id="bioClose">X</div>
+        </div>
+
+        <div class="bio-footer">
+          <div class="bio-dot"></div>
+          <div class="bio-contact">
+            Zihan (Bert) Wang<br>
+            bert010426@gmail.com
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  const workItems = document.querySelectorAll('.work-item');
+  const overlay = document.getElementById('overlay');
+  const overlayVideo = document.getElementById('overlayVideo');
+  const overlayClose = document.getElementById('overlayClose');
+  const mainView = document.getElementById('mainView');
+  const overlayDescription = document.getElementById('overlayDescription');
+
+  const logo = document.getElementById('logo');
+  const bioOverlay = document.getElementById('bioOverlay');
+  const bioClose = document.getElementById('bioClose');
+
+  const works = document.getElementById('workList');
+  const yearLine = document.querySelector('.year-line');
+
+  const videoWrapper = document.querySelector('.overlay-video-wrapper');
+
+  // ▶ 新增：YouTube 链接相关元素
+  const overlayLinkBar = document.getElementById('overlayLinkBar');
+  const overlayLink = document.getElementById('overlayLink');
+
+  // ▶ 新增：每个作品对应的 YouTube 链接
+  const youtubeLinks = {
+    "Stormy.mp4": "https://youtu.be/wDOQlULgig8",
+    "Whistleblower-Final cut.mp4": "https://youtu.be/SDflFaOAgHA",
+    "Harakiri+Duel.mp4": "https://youtu.be/1H5q_HdxQ8A",
+    "Ozymandias (2024FA).mp4": "https://youtu.be/vhygYNXJfPk",
+    "Calligram of Triregnum Final 4k.mp4": "https://youtu.be/kvrN52tWedc",
+    "The indecisive moment.mp4": "https://youtu.be/SC-g3BVxTRE"
+  };
+
+  // 各视频对应描述内容（时间与学期拆开）
+  const descriptions = {
+    "Stormy.mp4": {
+      title: "STORMY",
+      durationTime: "04:15 min",
+      durationTerm: "FA 2022",
+      term: "Director, cinematographer, editor",
+      text: "A debut film school project shot primarily at night. It follows a man’s journey toward suicide in despair. Finally, the dawn of hope seemed to begin after the man decided to walk into the sea."
+    },
+    "Whistleblower-Final cut.mp4": {
+      title: "WHISTLEBLOWER",
+      durationTime: "04:40 min",
+      durationTerm: "SP 2024",
+      term: "Co-director, co-writer, editor",
+      text: "The story’s original intention was to depict the consequences of systematic violence against individuals, inspired by the mysterious deaths of two Boeing whistleblowers in 2024, a year marked by four fatal Boeing-related crashes."
+    },
+    "Harakiri+Duel.mp4": {
+      title: "HARAKIRI DUEL",
+      durationTime: "01:16 min",
+      durationTerm: "SU 2024",
+      term: "Director, performer, editor",
+      text: "Video stages a duel between me and the cinematic images itself. In the end, finally realizing the enemy that I face is merely a mirage. Experimented with personal expression and innovative cinematic forms. Independently directed, performed, edited, and composed score."
+    },
+    "Calligram of Triregnum Final 4k.mp4": {
+      title: "CALLIGRAM OF TRIREGNUM",
+      durationTime: "02:24 min",
+      durationTerm: "SP 2025",
+      term: "Director, animator, editor",
+      text: "Led all creative aspects, exploring intertextuality and experimental forms. Reimagined the early 20th-century calligram through innovative use of sound, movement, and technology, blending retro and avant-garde styles."
+    },
+    "The indecisive moment.mp4": {
+      title: "THE INDECISIVE MOMENT",
+      durationTime: "06:40 min",
+      durationTerm: "FA 2025",
+      term: "Director, cinematographer, editor",
+      text: "Project named after The Decisive Moment by Henri Cartier-Bresson, short film depicting the process of capturing and developing a piece of reality into a photo, featuring a unique personal style and experimentation."
+    },
+    "Ozymandias (2024FA).mp4": {
+      title: "OZYMANDIAS",
+      durationTime: "02:42 min",
+      durationTerm: "FA 2024",
+      term: "Found footage / Poetry Short",
+      text: "Description: This short film harnesses Percy Bysshe Shelley's sonnet \"Ozymandias\" and archival found footage, fused with experimental sound design and contemporary jazz fusion. Through tripartite poetry, audio, and visual synthesis, it constructs poetic narrative architecture that probes the political unconscious."
+    }
+  };
+
+  function setDescription(videoFile) {
+    const d = descriptions[videoFile];
+    if (!d) {
+      overlayDescription.innerHTML = "";
+      return;
+    }
+    overlayDescription.innerHTML = `
+      <div class="desc-title">${d.title}</div>
+      <div class="desc-meta">
+        ${d.durationTime}<br>
+        ${d.durationTerm}<br>
+        ${d.term}
+      </div>
+      <div class="desc-text">${d.text}</div>
+    `;
+  }
+
+  // ▶ 新增：设置对应的 YouTube 链接文字
+  function setYoutubeLink(videoFile) {
+    const link = youtubeLinks[videoFile];
+    if (link) {
+      overlayLink.href = link;
+      overlayLink.textContent = link;
+      overlayLinkBar.style.display = 'block';
+    } else {
+      overlayLink.href = '#';
+      overlayLink.textContent = '';
+      overlayLinkBar.style.display = 'none';
+    }
+  }
+
+  // 计算竖线位置：居中于 2025 与 2022 的年份列，并在两者之间垂直延伸
+  function updateYearLine() {
+    if (!works || !yearLine) return;
+
+    const yearEls = works.querySelectorAll('.year');
+    if (yearEls.length === 0) return;
+
+    const topYearEl = yearEls[0];                       // 2025
+    const bottomYearEl = yearEls[yearEls.length - 1];  // 2022
+
+    const worksRect = works.getBoundingClientRect();
+    const topRect = topYearEl.getBoundingClientRect();
+    const bottomRect = bottomYearEl.getBoundingClientRect();
+
+    // 水平居中：取年份数字左右边界的中点
+    const centerX = (topRect.left + topRect.right) / 2 - worksRect.left;
+
+    // 垂直范围：从 2025 的下方一点到 2022 的上方一点
+    const topY = topRect.bottom - worksRect.top + 10;
+    const bottomY = bottomRect.top - worksRect.top - 10;
+    const height = Math.max(0, bottomY - topY);
+
+    yearLine.style.left = `${centerX}px`;
+    yearLine.style.top = `${topY}px`;
+    yearLine.style.height = `${height}px`;
+  }
+
+  window.addEventListener('load', updateYearLine);
+  window.addEventListener('resize', updateYearLine);
+
+  // 点击作品 → 打开视频 overlay（统一使用 data-drive iframe）
+  workItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const videoFile = item.getAttribute('data-video');
+      const driveLink = item.getAttribute('data-drive');
+
+      // 清理上一次的 iframe（如果有）
+      const oldIframe = document.getElementById('drivePlayer');
+      if (oldIframe) oldIframe.remove();
+
+      // 先暂停 & 隐藏原生 video（目前等于备用方案）
+      overlayVideo.pause();
+      overlayVideo.currentTime = 0;
+      overlayVideo.style.display = 'none';
+      overlayVideo.src = '';
+
+      if (driveLink) {
+        // 使用 Google Drive / YouTube iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'drivePlayer';
+        iframe.src = driveLink;
+        iframe.title = 'Video player';
+        iframe.frameBorder = '0';
+        iframe.allow = 'autoplay';
+        iframe.allowFullscreen = true;
+        iframe.style.width = '150%';
+        iframe.style.height = '150%';
+        iframe.style.backgroundColor = '#000';
+        videoWrapper.appendChild(iframe);
+      } else {
+        // 兜底：使用本地 / 服务器视频源
+        overlayVideo.style.display = 'block';
+        overlayVideo.src = videoFile;
+        overlayVideo.load();
+        overlayVideo.play().catch(() => {});
+      }
+
+      // 描述
+      setDescription(videoFile);
+      // ▶ 设置对应的 YouTube 链接
+      setYoutubeLink(videoFile);
+
+      mainView.style.display = 'none';
+      overlay.style.display = 'flex';
+    });
+  });
+
+  // 关闭视频 overlay
+  overlayClose.addEventListener('click', () => {
+    overlayVideo.pause();
+    overlayVideo.currentTime = 0;
+
+    const oldIframe = document.getElementById('drivePlayer');
+    if (oldIframe) oldIframe.remove();
+
+    overlay.style.display = 'none';
+    mainView.style.display = 'block';
+  });
+
+  // 点击 logo → 显示 Bio 叠加卡片
+  logo.addEventListener('click', () => {
+    bioOverlay.style.display = 'flex';
+  });
+
+  // 点击 Bio 的 X → 关闭 Bio 卡片
+  bioClose.addEventListener('click', () => {
+    bioOverlay.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
