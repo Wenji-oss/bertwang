@@ -86,10 +86,10 @@
     text-decoration: underline;
   }
 
-  /* 竖向年份连线——位置由 JS 动态计算 */
+  /* 竖向年份连线 */
   .year-line {
     position: absolute;
-    width: 3px;           /* 细线厚度 */
+    width: 3px;
     background-color: #000;
     pointer-events: none;
   }
@@ -136,20 +136,20 @@
   }
 
   .overlay-video-wrapper video {
-    width: 150%;
-    height: 150%;
+    width: 100%;
+    height: 100%;
     display: block;
     background-color: #000;
   }
 
-  /* ▶ 新增：视频下方的 YouTube 链接条 */
+  /* ▶ 视频下方的 YouTube 链接条：距离视频 5%，与视频同宽，20px 字号 */
   .overlay-link-bar {
-    margin-top: 18%;
-    width: 33vw;
-    max-width: 2000px;
+    margin-top: 5%;
+    width: 50vw;
+    max-width: 960px;
     min-width: 320px;
     text-align: left;
-    font-size: 30px;
+    font-size: 20px;
   }
 
   .overlay-link-bar a {
@@ -159,13 +159,13 @@
   }
 
   .overlay-description {
-    margin-top: 4%;
+    margin-top: 13%;
     width: 50vw;
     max-width: 1000px;
     min-width: 320px;
     font-size: 12px;
     line-height: 2;
-    margin-left: 5%;
+    margin-left: 0%;
   }
 
   .desc-title {
@@ -233,15 +233,13 @@
     border: 1px solid #eee;
     box-shadow: 0 10px 40px rgba(0,0,0,0.15);
     position: absolute;
-    Left:10%;
+    left: 10%;
     padding: 4% 6% 4% 0;
     box-sizing: border-box;
-    /* 整体放大一点 */
     transform: scale(1.3);
     transform-origin: center;
   }
 
-  /* 主文本与 red dot 左边缘对齐：都用 10% 偏移 */
   .bio-text {
     color: rgb(197, 27, 27);
     font-size: 20px;
@@ -254,7 +252,6 @@
     margin: 0 0 0.6rem 0;
   }
 
-  /* 右侧整块红色面板，从 Bio 标题顶到底边 */
   .bio-header-strip {
     position: absolute;
     top: 20%;
@@ -401,7 +398,7 @@
           <span class="year"></span>
         </div>
 
-        <!-- 交换顺序：先 Ozymandias 再 Harakiri Duel -->
+        <!-- 先 Ozymandias 再 Harakiri Duel -->
         <div class="work-item"
              data-video="Ozymandias (2024FA).mp4"
              data-drive="https://drive.google.com/file/d/1BcnQz3zcuYdo9ASRQfPikhXHqIVEAAVZ/preview">
@@ -432,7 +429,7 @@
           <span class="year">2022</span>
         </div>
 
-        <!-- 竖向细线（位置由 JS 设置） -->
+        <!-- 竖向细线 -->
         <div class="year-line"></div>
 
       </div>
@@ -446,7 +443,7 @@
             <video id="overlayVideo" controls></video>
           </div>
 
-          <!-- ▶ 新增：视频下方的 YouTube 链接条 -->
+          <!-- 视频下方的 YouTube 链接条 -->
           <div class="overlay-link-bar" id="overlayLinkBar">
             <a id="overlayLink" href="#" target="_blank" rel="noopener noreferrer"></a>
           </div>
@@ -507,11 +504,11 @@
 
   const videoWrapper = document.querySelector('.overlay-video-wrapper');
 
-  // ▶ 新增：YouTube 链接相关元素
+  // YouTube 链接栏
   const overlayLinkBar = document.getElementById('overlayLinkBar');
   const overlayLink = document.getElementById('overlayLink');
 
-  // ▶ 新增：每个作品对应的 YouTube 链接
+  // 每个作品对应的 YouTube 链接
   const youtubeLinks = {
     "Stormy.mp4": "https://youtu.be/wDOQlULgig8",
     "Whistleblower-Final cut.mp4": "https://youtu.be/SDflFaOAgHA",
@@ -521,7 +518,7 @@
     "The indecisive moment.mp4": "https://youtu.be/SC-g3BVxTRE"
   };
 
-  // 各视频对应描述内容（时间与学期拆开）
+  // 描述内容
   const descriptions = {
     "Stormy.mp4": {
       title: "STORMY",
@@ -584,7 +581,7 @@
     `;
   }
 
-  // ▶ 新增：设置对应的 YouTube 链接文字
+  // 设置对应的 YouTube 链接
   function setYoutubeLink(videoFile) {
     const link = youtubeLinks[videoFile];
     if (link) {
@@ -598,24 +595,21 @@
     }
   }
 
-  // 计算竖线位置：居中于 2025 与 2022 的年份列，并在两者之间垂直延伸
+  // 计算年份竖线
   function updateYearLine() {
     if (!works || !yearLine) return;
 
     const yearEls = works.querySelectorAll('.year');
     if (yearEls.length === 0) return;
 
-    const topYearEl = yearEls[0];                       // 2025
-    const bottomYearEl = yearEls[yearEls.length - 1];  // 2022
+    const topYearEl = yearEls[0];
+    const bottomYearEl = yearEls[yearEls.length - 1];
 
     const worksRect = works.getBoundingClientRect();
     const topRect = topYearEl.getBoundingClientRect();
     const bottomRect = bottomYearEl.getBoundingClientRect();
 
-    // 水平居中：取年份数字左右边界的中点
     const centerX = (topRect.left + topRect.right) / 2 - worksRect.left;
-
-    // 垂直范围：从 2025 的下方一点到 2022 的上方一点
     const topY = topRect.bottom - worksRect.top + 10;
     const bottomY = bottomRect.top - worksRect.top - 10;
     const height = Math.max(0, bottomY - topY);
@@ -628,24 +622,24 @@
   window.addEventListener('load', updateYearLine);
   window.addEventListener('resize', updateYearLine);
 
-  // 点击作品 → 打开视频 overlay（统一使用 data-drive iframe）
+  // 点击作品 → 打开 overlay
   workItems.forEach(item => {
     item.addEventListener('click', () => {
       const videoFile = item.getAttribute('data-video');
       const driveLink = item.getAttribute('data-drive');
 
-      // 清理上一次的 iframe（如果有）
+      // 清理上一次 iframe
       const oldIframe = document.getElementById('drivePlayer');
       if (oldIframe) oldIframe.remove();
 
-      // 先暂停 & 隐藏原生 video（目前等于备用方案）
+      // 隐藏备用 video
       overlayVideo.pause();
       overlayVideo.currentTime = 0;
       overlayVideo.style.display = 'none';
       overlayVideo.src = '';
 
       if (driveLink) {
-        // 使用 Google Drive / YouTube iframe
+        // 使用 iframe 播放（Drive 或 YouTube）
         const iframe = document.createElement('iframe');
         iframe.id = 'drivePlayer';
         iframe.src = driveLink;
@@ -653,21 +647,19 @@
         iframe.frameBorder = '0';
         iframe.allow = 'autoplay';
         iframe.allowFullscreen = true;
-        iframe.style.width = '150%';
-        iframe.style.height = '150%';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
         iframe.style.backgroundColor = '#000';
         videoWrapper.appendChild(iframe);
       } else {
-        // 兜底：使用本地 / 服务器视频源
+        // 兜底：video 标签本地播放
         overlayVideo.style.display = 'block';
         overlayVideo.src = videoFile;
         overlayVideo.load();
         overlayVideo.play().catch(() => {});
       }
 
-      // 描述
       setDescription(videoFile);
-      // ▶ 设置对应的 YouTube 链接
       setYoutubeLink(videoFile);
 
       mainView.style.display = 'none';
@@ -675,7 +667,7 @@
     });
   });
 
-  // 关闭视频 overlay
+  // 关闭 overlay
   overlayClose.addEventListener('click', () => {
     overlayVideo.pause();
     overlayVideo.currentTime = 0;
@@ -687,12 +679,12 @@
     mainView.style.display = 'block';
   });
 
-  // 点击 logo → 显示 Bio 叠加卡片
+  // logo → 打开 Bio
   logo.addEventListener('click', () => {
     bioOverlay.style.display = 'flex';
   });
 
-  // 点击 Bio 的 X → 关闭 Bio 卡片
+  // 关闭 Bio
   bioClose.addEventListener('click', () => {
     bioOverlay.style.display = 'none';
   });
@@ -700,3 +692,4 @@
 
 </body>
 </html>
+
